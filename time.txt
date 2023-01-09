@@ -1,0 +1,23 @@
+4000 images = 5372.014461278915 seconds jupiter standing walking kneeling csv(sequential code)
+100(small subset) images = 6.331634283065796 seconds jupiter humans taraturs images csv
+
+-------------------------------------------------------------------------------------------------
+MultiThreaded times from below:
+
+ It took 2406.4533598423004 seconds to run jupiter humans 54K
+
+It took 38.48038721084595 seconds to run = loop over 54K ids in excel(all of them have had inference data from previous run) = jupiter 54k humans
+
+It took 2696.4388217926025 seconds to run 100K images random jupiter
+
+
+It took 2589.589379787445 seconds to run 100K imgaes jupiter unlabeled 1
+
+I took 2320.24959564209 seconds to run 100K images jupiter unlabeled 2
+
+It took 2296.194918870926 seconds to run 100K images jupiter unlabeled 3
+
+It took 2300.187758922577 seconds to run 100K images jupiter unlabeled 4
+
+It took 2487.3152034282684 seconds to run 100K images jupiter unlabeled 5
+
