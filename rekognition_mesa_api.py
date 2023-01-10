@@ -42,7 +42,7 @@ def rekognition():
                         #'Bytes': b'bytes',
                         'S3Object': {
                             'Bucket': 'mesa-data',
-                            'Name': 'dev/images/fc258e60-b7dd-4e67-b612-106a98f45b84-datapoint_front-left-right_debayeredrgb.png',
+                            'Name': 'dev/images/91d83aa5-2d12-4bbc-8344-928b2caab34f-datapoint_rear-left_debayeredrgb.png',
                             #'Version': 'string'
                         }
                     },
@@ -53,12 +53,15 @@ def rekognition():
                 properties = []
                 style = 'categorical'
                 bounding_boxes = []
-                
+                total_relevant_classifications = 0
+                total_relevant_detections = 0
+                print(response)
                 for i in range(total_detections):
                     rekognition_object = response['Labels'][i]['Name']
                     if len(response['Labels'][i]['Instances']) < 1 :
-                        #style = 'bounding_box'
+                        style = 'categorical'
                         if(rekognition_object in label_map.values()):
+                            total_relevant_classifications=+1
                             properties.append(
                             {
                                 'title': rekognition_object ,
@@ -69,13 +72,13 @@ def rekognition():
                                         'value': 'yes' 
                                 }
                         })
-
                         #for bounding boxes
-                    elif len(response['Labels'][i]['Instances']) >= 1:
+                    elif len(response['Labels'][i]['Instances']) >= 1 and rekognition_object in label_map.values():
                         bounding_box_instances = len(response['Labels'][i]['Instances'])
                         style = 'bounding_box'
-                        if(rekognition_object in label_map.values()):
-                            properties.append(
+                        print(style)
+                        total_relevant_detections +=1
+                        properties.append(
                             {
                                 'title': rekognition_object ,
                                 'value': rekognition_object,
@@ -83,9 +86,9 @@ def rekognition():
                                     'answer': {
                                         'title': 'yes',
                                         'value': 'yes'
-                            }
-                        })
-
+                                            }
+                            })
+                        print('meeeee')
                         for j in range(bounding_box_instances):
                             bounding_box_path = response['Labels'][i]['Instances'][j]['BoundingBox']
                             bound_box_confidence = response['Labels'][i]['Instances'][j]['Confidence']
@@ -114,13 +117,13 @@ def rekognition():
                                     ]
                                 }
                             )
-                if style == 'categorical':
+                if  total_relevant_classifications !=0 and total_relevant_detections == 0:
                     values = {
                     'kind': 'brt',#must be switched to rekognition
                     'project_name': 'jupiter',
                     'properties': properties,
                     'state': 'ok',
-                    'style': style,
+                    'style': 'categorical',
                     'vendor_metadata': {
                         'rekognition': {
                             'min_confidence': '0.6'
@@ -131,14 +134,14 @@ def rekognition():
                     #'s3_bucket': 'mesa-data'
                         }
 
-                elif style == 'bounding_box':
+                elif  total_relevant_detections !=0:
                     values = {
                     'kind': 'brt',#must be switched to rekognition
                     'project_name': 'jupiter',
                     'properties': properties,
                     'bounding_boxes': bounding_boxes,
                     'state': 'ok',
-                    'style': style,
+                    'style': 'bounding_box',
                     'vendor_metadata': {
                         'rekognition': {
                             'min_confidence': '0.6'
@@ -149,8 +152,28 @@ def rekognition():
                     #'s3_key': 'dev/images/3a9b9e2a-ae1e-411d-b485-f89c98b1d1ed-datapoint_front-center-right_debayeredrgb.png',
                     #'s3_bucket': 'mesa-data'
                         }
-                annotation = AnnotationAPI(image_id=str('621d2ac2355efa33d3df5276'), values=values)
-                #print(annotation)
+                elif total_relevant_detections == 0 and total_relevant_classifications == 0:
+                      values = {
+                    'kind': 'brt',#must be switched to rekognition
+                    'project_name': 'jupiter',
+                    'properties': [],
+                    'state': 'ok',
+                    'style': 'bounding_box',
+                    'nothing_to_annotate': True,
+                    'vendor_metadata': {
+                        'rekognition': {
+                            'min_confidence': '0.6'
+                            }
+                        },
+                    'label_map': label_map,
+                    
+                    #'s3_key': 'dev/images/3a9b9e2a-ae1e-411d-b485-f89c98b1d1ed-datapoint_front-center-right_debayeredrgb.png',
+                    #'s3_bucket': 'mesa-data'
+                        }
+
+
+                annotation = AnnotationAPI(image_id=str('621d27f7355efa33d3df48f5'), values=values)
+                print(annotation)
                 annotation.create()               
         
             except Exception as e:
@@ -163,3 +186,4 @@ rekognition()
 #https://aletheia-dev.brtws.com/images/621d27cd355efa33d3df4865?project_name=jupiter&page=3
 
 
+#621d27f7355efa33d3df48f5 621d2ac2355efa33d3df5276 621d27cd355efa33d3df4865
