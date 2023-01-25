@@ -2,11 +2,7 @@ import json
 import base64
 import time
 import boto3
-
-
 import brtdevkit
-
-
 import pandas as pd
 import numpy as np
 import argparse
