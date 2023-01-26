@@ -1,10 +1,10 @@
+
+
+import urllib
 import json
 import base64
 import time
 import boto3
-
-
-import brtdevkit
 
 
 import pandas as pd
@@ -59,10 +59,10 @@ def lambda_handler(event, context):
             json_data_array.append(i)
         #print(json_data,'json dataaa')
         print(json_data_array,'data arrrrraaay')
-        print('THIS IS STILL GOINNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNG')
         def rekognition(item):
             print(item,'ITEEEEEEEEM')
             try:
+                image_id = item['image_id]
                 for i in item['artifacts']:
                 
                     s3_key_string = str(i['s3_key'])
@@ -212,9 +212,19 @@ def lambda_handler(event, context):
                                 }
                        
                         print(values,'VALUES')
-                         #annotation.crate(values)
                         
                         #annotation.create(values)
+                        
+                        try:
+                            url = f'https://tartarus-dev-api.brtws.com/annotation/{image_id}'
+                            data = {values}
+                            data = json.dumps(data).encode()
+                            req = urllib.request.Request(url, data = data, method = 'POST')
+                            req.add_header('Content-Type', 'application/json')
+                            response = urllib.request.urlopen(req)
+                            print(response.read().decode())
+                        except urllib.error.HTTPError as err:
+                            print(f'error occured:  {err}')
                     break
                     
                     
@@ -245,7 +255,7 @@ def lambda_handler(event, context):
 
 def get_secret():
 
-    secret_name = "BRT_REFRESH_TOKEN"
+    secret_name = "API_Key"
     region_name = "us-west-2"
 
     # Create a Secrets Manager client
@@ -266,3 +276,31 @@ def get_secret():
 
     # Decrypts secret using the associated KMS key.
     secret = get_secret_value_response['SecretString']
+    json_secret = json.loads(secret)
+    value = json_secret['API_Key']
+    
+    return value
+
+
+#GET REQUEST TO PROD API
+#def lambda_handler(event, context):
+ #   api_key = get_secret()
+  #  url = 'https://tartarus-dev-api.brtws.com/images'
+   # params = {'count': 10, 'page': 1, 'project_name': 'jupiter'}
+    #query_string = urllib.parse.urlencode(params)
+    #headers = {'Accept': 'application/json', 'API-Key': api_key}    
+    #print(headers)
+    #req = urllib.request.Request(url + '?' + query_string, headers=headers)
+    #try:
+     #   response = urllib.request.urlopen(req)
+      #  data = response.read()
+       # return {
+        #    'statusCode': response.status,
+         #   'body': data.decode("utf-8")
+        #}
+    #except urllib.error.HTTPError as err:
+     #   return {
+      #      'statusCode': err.code,
+       #     'body': err.reason
+        #}
+    
