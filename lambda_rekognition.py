@@ -1,12 +1,8 @@
-
-
 import urllib
 import json
 import base64
 import time
 import boto3
-
-
 import pandas as pd
 import numpy as np
 import argparse
@@ -58,11 +54,11 @@ def lambda_handler(event, context):
         for i in json_data:
             json_data_array.append(i)
         #print(json_data,'json dataaa')
-        print(json_data_array,'data arrrrraaay')
+        
         def rekognition(item):
             print(item,'ITEEEEEEEEM')
             try:
-                image_id = item['image_id]
+                image_id = item['image_id']
                 for i in item['artifacts']:
                 
                     s3_key_string = str(i['s3_key'])
@@ -211,8 +207,7 @@ def lambda_handler(event, context):
                                 #'s3_bucket': 'mesa-data'
                                 }
                        
-                        print(values,'VALUES')
-                        
+                        print(values,'VALUES')                 
                         #annotation.create(values)
                         
                         try:
